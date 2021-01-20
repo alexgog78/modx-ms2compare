@@ -1,0 +1,19 @@
+.ms2compare_link .empty,
+.ms2compare_link.full .not_empty {
+    display: block;
+}
+
+.ms2compare_link .not_empty,
+.ms2compare_link.full .empty {
+    display: none;
+}
+
+.ms2compare_form [name="ms2compare_action"][value="add"],
+.ms2compare_form.active [name="ms2compare_action"][value="remove"] {
+    display: block;
+}
+
+.ms2compare_form [name="ms2compare_action"][value="remove"],
+.ms2compare_form.active [name="ms2compare_action"][value="add"] {
+    display: none;
+}

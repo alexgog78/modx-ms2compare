@@ -1,6 +1,6 @@
 <?php
 
-if (empty($_REQUEST['ms2_compare'])) {
+if (empty($_REQUEST['ms2compare_action'])) {
     die('Access denied');
 }
 

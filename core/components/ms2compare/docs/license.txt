@@ -1,0 +1,5 @@
+--------------------
+ms2Compare
+--------------------
+Author: GrimWeb <a.goguev@alexgog.ru>
+--------------------
