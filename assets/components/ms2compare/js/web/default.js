@@ -82,7 +82,7 @@
             success: function (response) {
                 this._form.removeClass(this.config.activeFormClass);
                 this.updateTotals(response.data.totals);
-                $(this.config.resourceUniqueSelectorPrefix + response.data.id).delay(100).fadeOut();
+                $(this.config.resourceUniqueSelectorPrefix + response.data.id).delay(50).fadeOut();
                 this.message.info(response.message);
                 if (response.data.totals.lists[response.data.list] <= 0 && $(this.config.resourcesContainerSelector).length > 0) {
                     location.reload();
@@ -106,10 +106,10 @@
             let view = $(this).data('view');
             switch (view) {
                 case 'all':
-                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeIn();
+                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeIn(200);
                     break;
                 case 'diff':
-                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeOut();
+                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeOut(200);
                     break;
             }
         });

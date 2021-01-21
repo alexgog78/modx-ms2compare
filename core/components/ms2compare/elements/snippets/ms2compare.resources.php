@@ -29,10 +29,10 @@ if (!$modx->loadClass('pdofetch', MODX_CORE_PATH . 'components/pdotools/model/pd
 $pdoFetch = new pdoFetch($modx, $scriptProperties);
 
 $fields = (!empty($fields)) ? explode(',', $fields) : [];
+$fieldsMeta = $modx->getFieldMeta('msProductData');
 if (empty($fields)) {
     $excludeFields = (!empty($excludeFields)) ? explode(',', $excludeFields) : [];
-    $dataFields = $modx->getFields('msProductData');
-    $fields = array_diff(array_keys($dataFields), $excludeFields);
+    $fields = array_diff(array_keys($fieldsMeta), $excludeFields);
 }
 
 $resources = $ms2Compare->resourcesHandler->get($list);
@@ -103,6 +103,8 @@ foreach ($userProperties as $v) {
 
 $pdoProperties = array_merge($properties, $scriptProperties);
 $pdoFetch->setConfig($pdoProperties, false);
+
+
 $products = $pdoFetch->run();
 if (!empty($products) && is_array($products)) {
     foreach ($products as $product) {
@@ -127,6 +129,9 @@ $showEmpty = (!empty($showEmpty)) ? explode(',', $showEmpty) : [];
 foreach ($output['rows'] as $field => $values) {
     $values = $values['values'];
     foreach ($values as $index => $value) {
+        if ($fieldsMeta[$field]['phptype'] == 'float') {
+            $values[$index] = (float)$value;
+        }
         if (is_array($value)) {
             $values[$index] = implode(',', $value);
         }
@@ -136,8 +141,8 @@ foreach ($output['rows'] as $field => $values) {
     $countValues = count($uniqueValues);
     if ($countValues == 1) {
         $output['rows'][$field]['same'] = true;
-        $value = $uniqueValues[0];
-        if (!$value && !in_array($field, $showEmpty)) {
+        $value = current($uniqueValues);
+        if ((!$value) && !in_array($field, $showEmpty)) {
             unset($output['rows'][$field]);
         }
     }

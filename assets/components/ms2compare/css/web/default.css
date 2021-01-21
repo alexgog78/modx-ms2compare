@@ -18,11 +18,26 @@
     display: none;
 }
 
-.ms2compare_table-field-cell {
+.ms2compare_table .ms2compare_table-cell_corner,
+.ms2compare_table .ms2compare_table-cell_field {
     width: 300px;
     min-width: 300px;
+    border-right-width: 2px;
+    border-left-width: 0;
 }
 
-.ms2compare_table-cell {
+.ms2compare_table .ms2compare_table-cell_corner {
+    border-top-width: 0;
+    vertical-align: bottom;
+}
+
+.ms2compare_table .ms2compare_table-cell_product,
+.ms2compare_table .ms2compare_table-cell {
     min-width: 300px;
+    border-top-width: 0;
+}
+
+.ms2compare_table .ms2compare_table-cell_product:last-child,
+.ms2compare_table .ms2compare_table-cell:last-child {
+    border-right-width: 0px;
 }
