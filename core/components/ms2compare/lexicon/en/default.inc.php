@@ -9,3 +9,5 @@ $_lang[$prefix . 'remove'] = 'Удалить из сравнения';
 $_lang[$prefix . 'clear'] = 'Очистить список сравнения';
 $_lang[$prefix . 'count'] = 'Товаров';
 $_lang[$prefix . 'is_empty'] = 'Список сравнения пуст';
+$_lang[$prefix . 'options_all'] = 'Все параметры';
+$_lang[$prefix . 'options_diff'] = 'Различающиеся';

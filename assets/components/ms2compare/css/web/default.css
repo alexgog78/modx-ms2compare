@@ -17,3 +17,12 @@
 .ms2compare_form.active [name="ms2compare_action"][value="add"] {
     display: none;
 }
+
+.ms2compare_table-field-cell {
+    width: 300px;
+    min-width: 300px;
+}
+
+.ms2compare_table-cell {
+    min-width: 300px;
+}

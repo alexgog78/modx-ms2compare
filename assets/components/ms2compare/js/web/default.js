@@ -1,3 +1,5 @@
+'use strict';
+
 (function (window, document, $, ms2CompareConfig) {
     var ms2Compare = ms2Compare || {
         _form: null,
@@ -12,6 +14,11 @@
         totalListCountSelectorPrefix: '.ms2compare_count_',
         resourcesContainerSelector: '.ms2compare_resources',
         resourceUniqueSelectorPrefix: '.ms2compare_resource_',
+        optionsViewSelector: '.ms2compare_options-view',
+        activeOptionsViewClass: 'active',
+        resourcesTableSelector: '.ms2compare_table',
+        resourcesTableRow: '.ms2compare_table-row',
+        sameTableRowClass: 'same',
         actionUrl: ms2CompareConfig.actionUrl,
         actionKey: ms2CompareConfig.actionKey,
     }
@@ -24,6 +31,9 @@
             let action = ms2Compare._form.find('[name=' + ms2Compare.config.actionKey + ']:visible').val();
             ms2Compare.request(action, formData);
         });
+        if ($(this.config.resourcesContainerSelector).length > 0) {
+            ms2Compare.resourcesView();
+        }
     };
 
     ms2Compare.request = function (action, data) {
@@ -72,9 +82,9 @@
             success: function (response) {
                 this._form.removeClass(this.config.activeFormClass);
                 this.updateTotals(response.data.totals);
-                $(this.config.resourceUniqueSelectorPrefix + response.data.id).remove();
+                $(this.config.resourceUniqueSelectorPrefix + response.data.id).delay(100).fadeOut();
                 this.message.info(response.message);
-                if (response.data.total <= 0 && $(this.config.resourcesContainerSelector).length > 0) {
+                if (response.data.totals.lists[response.data.list] <= 0 && $(this.config.resourcesContainerSelector).length > 0) {
                     location.reload();
                 }
             },
@@ -83,10 +93,26 @@
             before: function () {
             },
             success: function (response) {
-                this.updateTotals(response.data.total);
+                this.updateTotals(response.data.totals);
                 location.reload();
             },
         },
+    };
+
+    ms2Compare.resourcesView = function () {
+        $(document).on('click', this.config.optionsViewSelector, function (e) {
+            e.preventDefault();
+            let $table = $(this).parents(ms2Compare.config.resourcesTableSelector);
+            let view = $(this).data('view');
+            switch (view) {
+                case 'all':
+                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeIn();
+                    break;
+                case 'diff':
+                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeOut();
+                    break;
+            }
+        });
     };
 
     ms2Compare.updateTotals = function (totals) {
@@ -115,7 +141,7 @@
 
     $(document).ready(function ($) {
         ms2Compare.initialize();
-        var html = $('html');
+        let html = $('html');
         html.removeClass('no-js');
         if (!html.hasClass('js')) {
             html.addClass('js');

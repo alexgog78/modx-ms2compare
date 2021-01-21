@@ -5,6 +5,9 @@
  * @var array $scriptProperties
  * @var string $list
  * @var string $fields
+ * @var string $excludeFields
+ * @var string $showEmpty
+ * @var string $tpl
  * @var string $emptyTpl
  */
 
@@ -25,48 +28,26 @@ if (!$modx->loadClass('pdofetch', MODX_CORE_PATH . 'components/pdotools/model/pd
 }
 $pdoFetch = new pdoFetch($modx, $scriptProperties);
 
-//unset($_SESSION['ms2compare']);
-echo '<pre>';
-print_r($_SESSION['ms2compare']);
-echo '</pre>';
-
 $fields = (!empty($fields)) ? explode(',', $fields) : [];
+if (empty($fields)) {
+    $excludeFields = (!empty($excludeFields)) ? explode(',', $excludeFields) : [];
+    $dataFields = $modx->getFields('msProductData');
+    $fields = array_diff(array_keys($dataFields), $excludeFields);
+}
+
 $resources = $ms2Compare->resourcesHandler->get($list);
-echo '<pre>';
-print_r($fields);
-print_r($resources);
-echo '</pre>';
+$total = $ms2Compare->resourcesHandler->getListTotal($list);
+if (!$total) {
+    return $pdoFetch->getChunk($emptyTpl);
+}
 
-
-/*$zzz = $pdoFetch->runSnippet('msProducts', [
-    'parents' => 0,
-    'resources' => implode(',', $resources),
-    'return' => 'json',
-    //'toPlaceholder' => 'zzz'
-    //'returnIds' => 1,
-]);
-//$placeholderValue = $modx->getPlaceholder('zzz');
-var_dump($zzz);
-echo '<hr>';*/
-
-
-/*$default = array(
-    'class' => 'msProduct',
-    'where' => $where,
-    'leftJoin' => [],
-    'innerJoin' => $innerJoin,
-    'select' => $select,
-    'sortby' => 'msProduct.id',
-    'sortdir' => 'ASC',
-    'groupby' => implode(', ', $groupby),
-    'return' => !empty($returnIds)
-        ? 'ids'
-        : 'data',
-    'nestedChunkPrefix' => 'minishop2_',
-);
-// Merge all properties and run!
-$pdoFetch->setConfig(array_merge($default, $scriptProperties), false);
-$rows = $pdoFetch->run();*/
+$output = [
+    'list' => $list,
+    'fields' => $fields,
+    'total' => $total,
+    'products' => [],
+    'rows' => [],
+];
 
 $properties = [
     'class' => 'msProduct',
@@ -91,8 +72,6 @@ $properties = [
     ],
     'return' => 'data',
 ];
-
-
 if (!empty($includeThumbs)) {
     $thumbs = array_map('trim', explode(',', $includeThumbs));
     foreach ($thumbs as $thumb) {
@@ -122,16 +101,48 @@ foreach ($userProperties as $v) {
     unset($scriptProperties[$v]);
 }
 
-$properties = array_merge($properties, $scriptProperties);
-$pdoFetch->setConfig($properties, false);
-$rows = $pdoFetch->run();
-foreach ($rows as $row) {
-    $row['price'] = $miniShop2->formatPrice($row['price']);
-    $row['old_price'] = $miniShop2->formatPrice($row['old_price']);
-    $row['weight'] = $miniShop2->formatWeight($row['weight']);
-    $row['idx'] = $pdoFetch->idx++;
+$pdoProperties = array_merge($properties, $scriptProperties);
+$pdoFetch->setConfig($pdoProperties, false);
+$products = $pdoFetch->run();
+if (!empty($products) && is_array($products)) {
+    foreach ($products as $product) {
+        $product['price'] = $miniShop2->formatPrice($product['price']);
+        $product['old_price'] = $miniShop2->formatPrice($product['old_price']);
+        $product['weight'] = $miniShop2->formatWeight($product['weight']);
+
+        $output['products'][] = $product;
+        foreach ($fields as $field) {
+            if (!isset($output['rows'][$field])) {
+                $output['rows'][$field] = [
+                    'same' => false,
+                    'values' => [],
+                ];
+            }
+            $output['rows'][$field]['values'][$product['id']] = $product[$field];
+        }
+    }
 }
 
-$output = [];
+$showEmpty = (!empty($showEmpty)) ? explode(',', $showEmpty) : [];
+foreach ($output['rows'] as $field => $values) {
+    $values = $values['values'];
+    foreach ($values as $index => $value) {
+        if (is_array($value)) {
+            $values[$index] = implode(',', $value);
+        }
+    }
 
+    $uniqueValues = array_unique($values);
+    $countValues = count($uniqueValues);
+    if ($countValues == 1) {
+        $output['rows'][$field]['same'] = true;
+        $value = $uniqueValues[0];
+        if (!$value && !in_array($field, $showEmpty)) {
+            unset($output['rows'][$field]);
+        }
+    }
+}
+
+$modx->lexicon->load('minishop2:product');
+$modx->setPlaceholder('ms2compare_count_' . $list, $total);
 return $pdoFetch->getChunk($tpl, $output);

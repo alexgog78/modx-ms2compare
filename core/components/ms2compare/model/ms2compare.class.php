@@ -11,7 +11,6 @@ class ms2Compare extends abstractModule
     const PKG_VERSION = '1.0.0';
     const PKG_RELEASE = 'beta';
     const PKG_NAMESPACE = 'ms2compare';
-    const DEVELOPER_MODE = true;//TODO
 
     /** @var array */
     public $session = [];

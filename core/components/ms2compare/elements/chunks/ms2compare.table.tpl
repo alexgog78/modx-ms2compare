@@ -1,44 +1,67 @@
-<div class="table-responsive">
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th scope="col">#</th>
-        <th scope="col">First</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-    </tr>
-    <tr class="table-success">
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-    </tr>
-    <tr>
-        <th scope="row">2</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-    </tr>
-    <tr>
-        <th scope="row">3</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-    </tr>
-    <tr>
-        <th scope="row">4</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-    </tr>
-    </tbody>
-</table>
+<form method="post" class="ms2compare_form">
+    <h5>{'ms2compare_count' | lexicon}: <span class="ms2compare_count_{$list}">{$_modx->getPlaceholder('ms2compare_count_' ~ $list)}</span></h5>
+    <input type="hidden" name="list" value="{$list}">
+    <button class="btn btn-warning" type="submit" name="ms2compare_action" value="clear">{'ms2compare_clear' | lexicon}</button>
+</form>
+<div class="ms2compare_resources table-responsive">
+    <table class="ms2compare_table table table-hover">
+        <tr class="ms2compare_table-row">
+            <td>
+                <a href="javascript:" class="ms2compare_options-view active" data-view="all">{'ms2compare_options_all' | lexicon}</a>
+                <br>
+                <a href="javascript:" class="ms2compare_options-view" data-view="diff">{'ms2compare_options_diff' | lexicon}</a>
+            </td>
+            {foreach $products as $product}
+                <th class="ms2compare_resource_{$product.id}" scope="col">
+                    <a href="{$product.id | url}">
+                        {if $product.thumb?}
+                            <img src="{$product.thumb}" class="mw-100" alt="{$product.pagetitle}" title="{$product.pagetitle}">
+                        {else}
+                            <img src="{'assets_url' | option}components/minishop2/img/web/ms2_small.png" class="mw-100" alt="{$product.pagetitle}" title="{$product.pagetitle}">
+                        {/if}
+                    </a>
+                    <br>
+                    <a href="{$product.id | url}" class="font-weight-bold">{$product.pagetitle}</a>
+                    <br>
+                    <span class="price">{$product.price} {'ms2_frontend_currency' | lexicon}</span>
+                    {if $product.old_price?}
+                        <br>
+                        <span class="old_price">{$product.old_price} {'ms2_frontend_currency' | lexicon}</span>
+                    {/if}
+                    <br>
+                    <form method="post" class="ms2compare_form active">
+                        <input type="hidden" name="record_id" value="{$product.id}">
+                        <input type="hidden" name="list" value="{$list}">
+                        <button class="btn btn-outline-danger btn-sm" type="submit" name="ms2compare_action" value="remove">{'ms2compare_remove' | lexicon}</button>
+                    </form>
+                </th>
+            {/foreach}
+        </tr>
+        </thead>
+        <tbody>
+        {foreach $rows as $field => $data index=$index}
+            <tr class="ms2compare_table-row {$data.same ? 'same table-success' : ''}">
+                <th class="ms2compare_table-field-cell" scope="row">
+                    #{$index + 1}.
+                    {switch $field}
+                        {case 'vendor.name'}
+                            {'ms2_product_vendor' | lexicon}
+                        {default}
+                            {('ms2_product_' ~ $field) | lexicon}
+                    {/switch}
+                    {$field}
+                </th>
+                {foreach $data.values as $id => $value}
+                    <td class="ms2compare_table-cell ms2compare_resource_{$id}">
+                        {if $value | iterable}
+                            {$value | join : '; '}
+                        {else}
+                            {$value}
+                        {/if}
+                    </td>
+                {/foreach}
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
 </div>
