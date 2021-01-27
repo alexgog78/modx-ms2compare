@@ -1,11 +1,13 @@
 'use strict';
 
-(function (window, document, $, ms2CompareConfig) {
-    var ms2Compare = ms2Compare || {
-        _form: null,
-    };
+(function (window, document, $, ms2Compare) {
+    let _this = ms2Compare;
 
-    ms2Compare.config = {
+    $.extend(_this, {
+        _form: null,
+    });
+
+    _this.options = {
         formSelector: '.ms2compare_form',
         activeFormClass: 'active',
         totalSelector: '.ms2compare_link',
@@ -19,43 +21,41 @@
         resourcesTableSelector: '.ms2compare_table',
         resourcesTableRow: '.ms2compare_table-row',
         sameTableRowClass: 'same',
-        actionUrl: ms2CompareConfig.actionUrl,
-        actionKey: ms2CompareConfig.actionKey,
     }
 
-    ms2Compare.initialize = function () {
-        $(document).on('submit', this.config.formSelector, function (e) {
+    _this.initialize = function () {
+        $(document).on('submit', this.options.formSelector, function (e) {
             e.preventDefault();
-            ms2Compare._form = $(this);
-            let formData = ms2Compare._form.serializeArray();
-            let action = ms2Compare._form.find('[name=' + ms2Compare.config.actionKey + ']:visible').val();
-            ms2Compare.request(action, formData);
+            _this._form = $(this);
+            let formData = _this._form.serializeArray();
+            let action = _this._form.find('[name=' + _this.actionKey + ']:visible').val();
+            _this.request(action, formData);
         });
-        if ($(this.config.resourcesContainerSelector).length > 0) {
-            ms2Compare.resourcesView();
+        if ($(_this.options.resourcesContainerSelector).length > 0) {
+            _this.resourcesView();
         }
     };
 
-    ms2Compare.request = function (action, data) {
+    _this.request = function (action, data) {
         data.push({
-            name: this.config.actionKey,
+            name: _this.actionKey,
             value: action
         });
         $.ajax({
-            url: this.actionUrl,
+            url: _this.actionUrl,
             type: 'POST',
             dataType: 'json',
             data: data,
             beforeSend: function () {
-                ms2Compare.callbacks[action]['before'].call(ms2Compare);
+                _this.callbacks[action]['before'].call(_this);
             },
             success: function (response) {
                 switch (response.success) {
                     case true:
-                        ms2Compare.callbacks[action]['success'].call(ms2Compare, response);
+                        _this.callbacks[action]['success'].call(_this, response);
                         break;
                     default:
-                        ms2Compare.callbacks[action]['error'].call(ms2Compare, response);
+                        _this.callbacks[action]['error'].call(_this, response);
                         break;
                 }
             },
@@ -66,25 +66,25 @@
         });
     };
 
-    ms2Compare.callbacks = {
+    _this.callbacks = {
         add: {
             before: function () {
             },
             success: function (response) {
-                this._form.addClass(this.config.activeFormClass);
-                this.updateTotals(response.data.totals);
-                this.message.success(response.message);
+                _this._form.addClass(_this.options.activeFormClass);
+                _this.updateTotals(response.data.totals);
+                _this.message.success(response.message);
             },
         },
         remove: {
             before: function () {
             },
             success: function (response) {
-                this._form.removeClass(this.config.activeFormClass);
-                this.updateTotals(response.data.totals);
-                $(this.config.resourceUniqueSelectorPrefix + response.data.id).delay(50).fadeOut();
-                this.message.info(response.message);
-                if (response.data.totals.lists[response.data.list] <= 0 && $(this.config.resourcesContainerSelector).length > 0) {
+                _this._form.removeClass(_this.options.activeFormClass);
+                _this.updateTotals(response.data.totals);
+                $(_this.options.resourceUniqueSelectorPrefix + response.data.id).delay(50).fadeOut();
+                _this.message.info(response.message);
+                if (response.data.totals.lists[response.data.list] <= 0 && $(_this.options.resourcesContainerSelector).length > 0) {
                     location.reload();
                 }
             },
@@ -93,41 +93,41 @@
             before: function () {
             },
             success: function (response) {
-                this.updateTotals(response.data.totals);
+                _this.updateTotals(response.data.totals);
                 location.reload();
             },
         },
     };
 
-    ms2Compare.resourcesView = function () {
-        $(document).on('click', this.config.optionsViewSelector, function (e) {
+    _this.resourcesView = function () {
+        $(document).on('click', _this.options.optionsViewSelector, function (e) {
             e.preventDefault();
-            let $table = $(this).parents(ms2Compare.config.resourcesTableSelector);
+            let $table = $(this).parents(_this.options.resourcesTableSelector);
             let view = $(this).data('view');
             switch (view) {
                 case 'all':
-                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeIn(200);
+                    $table.find(_this.options.resourcesTableRow + '.' + _this.options.sameTableRowClass).fadeIn(200);
                     break;
                 case 'diff':
-                    $table.find(ms2Compare.config.resourcesTableRow + '.' + ms2Compare.config.sameTableRowClass).fadeOut(200);
+                    $table.find(_this.options.resourcesTableRow + '.' + _this.options.sameTableRowClass).fadeOut(200);
                     break;
             }
         });
     };
 
-    ms2Compare.updateTotals = function (totals) {
-        $(this.config.totalCountSelector).html(totals.total_count);
+    _this.updateTotals = function (totals) {
+        $(_this.options.totalCountSelector).html(totals.total_count);
         if (totals.total_count > 0) {
-            $(this.config.totalSelector).addClass(this.config.activeTotalClass);
+            $(_this.options.totalSelector).addClass(_this.options.activeTotalClass);
         } else {
-            $(this.config.totalSelector).removeClass(this.config.activeTotalClass);
+            $(_this.options.totalSelector).removeClass(_this.options.activeTotalClass);
         }
         $.each(totals.lists, function (key, value) {
-            $(ms2Compare.config.totalListCountSelectorPrefix + key).html(value);
+            $(_this.options.totalListCountSelectorPrefix + key).html(value);
         });
     };
 
-    ms2Compare.message = {
+    _this.message = {
         success: function (message) {
             alert(message);
         },
@@ -140,7 +140,7 @@
     };
 
     $(document).ready(function ($) {
-        ms2Compare.initialize();
+        _this.initialize();
         let html = $('html');
         html.removeClass('no-js');
         if (!html.hasClass('js')) {
@@ -148,5 +148,5 @@
         }
     });
 
-    window.ms2Compare = ms2Compare;
-})(window, document, jQuery, ms2CompareConfig);
+    window.ms2Compare = _this;
+})(window, document, jQuery, ms2Compare);

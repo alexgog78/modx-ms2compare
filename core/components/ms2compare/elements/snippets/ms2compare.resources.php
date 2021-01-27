@@ -37,9 +37,6 @@ if (empty($fields)) {
 
 $resources = $ms2Compare->resourcesHandler->get($list);
 $total = $ms2Compare->resourcesHandler->getListTotal($list);
-if (!$total) {
-    return $pdoFetch->getChunk($tplEmpty);
-}
 
 $output = [
     'list' => $list,
@@ -48,6 +45,10 @@ $output = [
     'products' => [],
     'rows' => [],
 ];
+
+if (!$total) {
+    return $pdoFetch->getChunk($tplEmpty, $output);
+}
 
 $properties = [
     'class' => 'msProduct',

@@ -74,9 +74,7 @@ class ms2CompareResourcesHandler
      */
     public function getListTotal($list = '')
     {
-        if (!$this->resources[$list]) {
-            $this->clear($list);
-        }
+        $this->initializeList($list);
         return count($this->resources[$list]);
     }
 
