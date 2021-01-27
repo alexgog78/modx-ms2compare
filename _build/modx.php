@@ -1,6 +1,6 @@
 <?php
 
-define('MODX_CORE_PATH',  dirname(__DIR__) . '/core/');
+define('MODX_CORE_PATH', dirname(__DIR__) . '/core/');
 
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CORE_PATH . 'model/modx/modx.class.php';

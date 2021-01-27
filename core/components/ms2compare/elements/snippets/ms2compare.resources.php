@@ -5,10 +5,10 @@
  * @var array $scriptProperties
  * @var string $list
  * @var string $fields
- * @var string $excludeFields
- * @var string $showEmpty
+ * @var string $fieldsToExclude
+ * @var string $fieldsToShowIfEmpty
  * @var string $tpl
- * @var string $emptyTpl
+ * @var string $tplEmpty
  */
 
 /** @var ms2Compare $ms2Compare */
@@ -31,14 +31,14 @@ $pdoFetch = new pdoFetch($modx, $scriptProperties);
 $fields = (!empty($fields)) ? explode(',', $fields) : [];
 $fieldsMeta = $modx->getFieldMeta('msProductData');
 if (empty($fields)) {
-    $excludeFields = (!empty($excludeFields)) ? explode(',', $excludeFields) : [];
-    $fields = array_diff(array_keys($fieldsMeta), $excludeFields);
+    $fieldsToExclude = (!empty($fieldsToExclude)) ? explode(',', $fieldsToExclude) : [];
+    $fields = array_diff(array_keys($fieldsMeta), $fieldsToExclude);
 }
 
 $resources = $ms2Compare->resourcesHandler->get($list);
 $total = $ms2Compare->resourcesHandler->getListTotal($list);
 if (!$total) {
-    return $pdoFetch->getChunk($emptyTpl);
+    return $pdoFetch->getChunk($tplEmpty);
 }
 
 $output = [
@@ -125,7 +125,7 @@ if (!empty($products) && is_array($products)) {
     }
 }
 
-$showEmpty = (!empty($showEmpty)) ? explode(',', $showEmpty) : [];
+$fieldsToShowIfEmpty = (!empty($fieldsToShowIfEmpty)) ? explode(',', $fieldsToShowIfEmpty) : [];
 foreach ($output['rows'] as $field => $values) {
     $values = $values['values'];
     foreach ($values as $index => $value) {
@@ -142,7 +142,7 @@ foreach ($output['rows'] as $field => $values) {
     if ($countValues == 1) {
         $output['rows'][$field]['same'] = true;
         $value = current($uniqueValues);
-        if ((!$value) && !in_array($field, $showEmpty)) {
+        if ((!$value) && !in_array($field, $fieldsToShowIfEmpty)) {
             unset($output['rows'][$field]);
         }
     }

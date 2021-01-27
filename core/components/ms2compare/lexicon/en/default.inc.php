@@ -1,5 +1,6 @@
 <?php
 
+//TODO
 $prefix = 'ms2compare_';
 $_lang['ms2compare'] = 'Сравнение товаров';
 
