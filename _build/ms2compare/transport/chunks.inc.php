@@ -6,7 +6,7 @@
  */
 
 $classKey = 'modChunk';
-$chunks = include PKG_TRANSPORT_DATA_PATH . 'chunks.php';
+$chunks = include PKG_BUILD_TRANSPORT_DATA_PATH . 'chunks.php';
 foreach ($chunks as $data) {
     $chunk = $modx->newObject($classKey);
     if ($data['static_file']) {

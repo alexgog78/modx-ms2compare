@@ -6,7 +6,7 @@
  */
 
 $classKey = 'modSnippet';
-$snippets = include PKG_TRANSPORT_DATA_PATH . 'snippets.php';
+$snippets = include PKG_BUILD_TRANSPORT_DATA_PATH . 'snippets.php';
 foreach ($snippets as $data) {
     $snippet = $modx->newObject($classKey);
     if ($data['static_file']) {
@@ -22,7 +22,7 @@ foreach ($snippets as $data) {
     ]), '', true, true);
 
     $properties = [];
-    $propertiesData = include PKG_TRANSPORT_PROPERTIES_PATH . 'snippet.' . $data['static_file'];
+    $propertiesData = include PKG_BUILD_TRANSPORT_PROPERTIES_PATH . 'snippet.' . $data['static_file'];
     foreach ($propertiesData as $propertyData) {
         $properties[] = array_merge([
             'desc' => PKG_NAME_LOWER . '_property_' . strtolower($propertyData['name']),

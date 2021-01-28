@@ -5,7 +5,7 @@
  * @var modPackageBuilder $builder
  */
 
-$source = PKG_TRANSPORT_RESOLVERS_PATH . 'category.php';
+$source = PKG_BUILD_TRANSPORT_RESOLVERS_PATH . 'category.php';
 $vehicle = $builder->createVehicle([
     'source' => $source,
 ], [

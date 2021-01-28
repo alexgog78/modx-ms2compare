@@ -6,7 +6,7 @@
  */
 
 $classKey = 'modPlugin';
-$plugins = include PKG_TRANSPORT_DATA_PATH . 'plugins.php';
+$plugins = include PKG_BUILD_TRANSPORT_DATA_PATH . 'plugins.php';
 foreach ($plugins as $data) {
     $plugin = $modx->newObject($classKey);
     if ($data['static_file']) {
